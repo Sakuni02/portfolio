@@ -3,25 +3,273 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --off-white: #f5f3ee;
+  --charcoal: #1a1a18;
+  --sepia: #8b6f47;
+  --warm-gray: #e8e4dc;
+  --background: var(--off-white);
+  --foreground: var(--charcoal);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.dark {
+  --background: var(--charcoal);
+  --foreground: var(--off-white);
+}
+
+@layer base {
+  html {
+    scroll-behavior: auto;
+    overflow-x: clip;
   }
-}
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: clip;
+    max-width: 100vw;
+    background-image: url("/textures/paper.svg");
+    background-repeat: repeat;
+    background-size: 400px 400px;
+  }
+
+  ::selection {
+    @apply bg-sepia/30 text-charcoal;
+  }
+
+  .dark ::selection {
+    @apply text-offwhite;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (pointer: coarse) {
+    .custom-cursor {
+      display: none !important;
+    }
+  }
+
+  .flip-carousel-track {
+    position: relative;
+  }
+
+  .flip-carousel-hide {
+    display: none !important;
+  }
+
+  @keyframes signature-progress {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  @keyframes coverflow-lift {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-4px) scale(1.01);
+    }
+  }
+
+  .coverflow-lift {
+    animation: coverflow-lift 5s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .coverflow-lift {
+      animation: none;
+    }
+  }
+
+  @keyframes skeleton-shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes skeleton-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .skeleton-line {
+    @apply relative overflow-hidden rounded-sm bg-warmgray/50 dark:bg-offwhite/10;
+  }
+
+  .skeleton-line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(139, 111, 71, 0.08) 45%,
+      rgba(139, 111, 71, 0.14) 50%,
+      rgba(139, 111, 71, 0.08) 55%,
+      transparent 100%
+    );
+    animation: skeleton-shimmer 1.8s ease-in-out infinite;
+  }
+
+  .skeleton-shimmer {
+    @apply relative overflow-hidden bg-warmgray/40 dark:bg-offwhite/[0.06];
+  }
+
+  .skeleton-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(139, 111, 71, 0.06) 40%,
+      rgba(139, 111, 71, 0.12) 50%,
+      rgba(139, 111, 71, 0.06) 60%,
+      transparent 100%
+    );
+    animation: skeleton-shimmer 2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-line::after,
+    .skeleton-shimmer::after {
+      animation: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .project-grid-card {
+      will-change: transform, opacity;
+    }
+  }
+}
+
+@layer components {
+  .polaroid-stack {
+    --frame-rotate: 0deg;
+    transform-origin: 50% 0%;
+    will-change: transform, opacity, filter;
+  }
+
+  .art-gallery-card {
+    transform-origin: 50% 0%;
+  }
+
+  .polaroid-shadow {
+    position: absolute;
+    inset: 0.6rem -0.25rem -0.5rem 0.85rem;
+    border: 1.5px solid rgba(26, 26, 24, 0.2);
+    background: #f3efe6;
+    transform: rotate(calc(var(--frame-rotate) + 4deg));
+    transform-origin: top center;
+    box-shadow: 0 3px 12px rgba(26, 26, 24, 0.1);
+    z-index: 0;
+    will-change: transform;
+  }
+
+  .polaroid-frame {
+    position: relative;
+    z-index: 1;
+    background: #fdfbf7;
+    padding: 0.7rem 0.7rem 0;
+    border: 2px solid rgba(26, 26, 24, 0.22);
+    box-shadow:
+      0 6px 22px rgba(26, 26, 24, 0.12),
+      0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    transform: rotate(var(--frame-rotate));
+    transform-origin: top center;
+    will-change: transform;
+  }
+
+  .art-gallery-photo {
+    will-change: transform;
+  }
+
+  .polaroid-tape {
+    position: absolute;
+    z-index: 3;
+    width: 3.5rem;
+    height: 1.15rem;
+    background: linear-gradient(
+      180deg,
+      rgba(248, 242, 228, 0.98) 0%,
+      rgba(225, 215, 195, 0.95) 55%,
+      rgba(210, 198, 175, 0.92) 100%
+    );
+    border: 1px solid rgba(26, 26, 24, 0.18);
+    box-shadow:
+      0 1px 3px rgba(26, 26, 24, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  .polaroid-tape-tl {
+    top: 0.1rem;
+    left: -0.55rem;
+    transform: rotate(-38deg);
+  }
+
+  .polaroid-tape-br {
+    right: -0.6rem;
+    bottom: 0.65rem;
+    transform: rotate(32deg);
+  }
+
+  .dark .polaroid-shadow {
+    border-color: rgba(245, 243, 238, 0.08);
+    background: #2a2926;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  }
+
+  .dark .polaroid-frame {
+    background: #f7f4ed;
+    border-color: rgba(245, 243, 238, 0.18);
+    box-shadow:
+      0 8px 28px rgba(0, 0, 0, 0.35),
+      0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  }
+
+  .dark .polaroid-tape {
+    border-color: rgba(245, 243, 238, 0.12);
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .polaroid-stack,
+    .art-gallery-card,
+    .polaroid-frame,
+    .polaroid-shadow,
+    .art-gallery-photo,
+    .polaroid-tape {
+      will-change: auto;
+    }
   }
 }
